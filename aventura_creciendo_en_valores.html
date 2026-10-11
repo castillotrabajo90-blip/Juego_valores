@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>La aventura de los valores</title>
+<style>
+:root{--ink:#17324d;--green:#1e9c69;--gold:#ffd166;--cream:#fff9e9}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:linear-gradient(#b8edff,#e9ffd8);color:var(--ink);min-height:100vh}
+main{max-width:760px;margin:auto;padding:14px}
+header{text-align:center;padding:8px 0 12px}h1{font-size:clamp(1.45rem,5vw,2.3rem);margin:4px}header p{margin:4px}
+.panel{background:#ffffffdf;border:2px solid #ffffff;border-radius:18px;padding:12px;box-shadow:0 5px 15px #24513c18;margin-bottom:12px}
+.stats{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800}
+#world{position:relative;width:100%;height:min(57vh,440px);min-height:300px;overflow:hidden;border:4px solid #fff;border-radius:22px;background:
+radial-gradient(ellipse at 12% 15%,#5abf75 0 8%,transparent 9%),
+radial-gradient(ellipse at 85% 22%,#4dbb70 0 10%,transparent 11%),
+radial-gradient(ellipse at 12% 80%,#59c879 0 10%,transparent 11%),
+radial-gradient(ellipse at 87% 82%,#5ac879 0 11%,transparent 12%),
+linear-gradient(135deg,#a8e78d,#70ce8c);box-shadow:inset 0 0 0 2px #3b9e65}
+.path{position:absolute;left:8%;top:43%;width:84%;height:17%;background:#f4d59b;border:3px solid #dfb773;border-radius:50%;transform:rotate(-9deg)}
+.path:after{content:"";position:absolute;left:30%;top:-95%;width:20%;height:280%;background:#f4d59b;border:3px solid #dfb773;border-radius:50%;transform:rotate(28deg)}
+.tree{position:absolute;font-size:clamp(28px,7vw,45px);filter:drop-shadow(0 3px 1px #438b50)}
+#hero{position:absolute;font-size:36px;left:8%;top:47%;z-index:5;transition:left .13s,top .13s;filter:drop-shadow(0 3px 1px #315d42);transform:translate(-50%,-50%)}
+.gem{position:absolute;font-size:27px;z-index:4;filter:drop-shadow(0 2px 2px #6b4ca0);animation:float 1.5s infinite ease-in-out}
+@keyframes float{50%{transform:translateY(-6px) scale(1.08)}}
+.station{position:absolute;z-index:3;background:#fff7dc;border:2px solid #c88b37;border-radius:13px;padding:5px 7px;font-size:12px;font-weight:800;text-align:center;box-shadow:0 3px 0 #c88b37;max-width:100px}
+#message{font-weight:650;line-height:1.45;min-height:48px}
+.controls{display:grid;grid-template-columns:repeat(3,60px);grid-template-rows:repeat(2,50px);gap:6px;justify-content:center;margin:8px 0}
+.controls button{font-size:23px;padding:0;background:#fff;border:2px solid #a4c7af;border-radius:14px;box-shadow:0 3px 0 #9eb9a7;touch-action:manipulation}
+.controls button:active,.choice:active{transform:translateY(2px);box-shadow:none}
+#up{grid-column:2}#left{grid-column:1;grid-row:2}#down{grid-column:2;grid-row:2}#right{grid-column:3;grid-row:2}
+button{cursor:pointer}button:focus-visible{outline:3px solid #264de4;outline-offset:2px}
+#choices{display:grid;gap:8px}.choice,.primary{padding:12px;border:0;border-radius:12px;font-weight:750;font-size:1rem;background:#fff0b8;color:#463411;text-align:left}
+.primary{background:#147c56;color:white;text-align:center;width:100%;margin-top:8px}
+#quiz{display:none}.small{font-size:.9rem;color:#37546b}.pill{background:#e5f6ec;border-radius:999px;padding:5px 10px}
+footer{text-align:center;font-size:.8rem;padding:10px;color:#38566a}
+</style>
+</head>
+<body>
+<main>
+<header><div style="font-size:2rem">🌳 💎 🏰</div><h1>La aventura de los valores</h1><p>¡Muévete por el reino y recupera los cristales!</p></header>
+<div class="panel stats"><span>💎 Cristales: <b id="score">0</b>/5</span><span>⭐ Puntos: <b id="points">0</b></span><span class="pill" id="level">Nivel 1</span></div>
+<div id="world" aria-label="Mapa del juego">
+<div class="path"></div>
+<span class="tree" style="left:3%;top:4%">🌲</span><span class="tree" style="left:78%;top:3%">🌳</span>
+<span class="tree" style="left:4%;top:70%">🌳</span><span class="tree" style="left:83%;top:70%">🌲</span>
+<span class="tree" style="left:45%;top:3%">🌿</span><span class="tree" style="left:49%;top:80%">🌼</span>
+<div class="station" style="left:6%;top:23%">🤝<br>Respeto</div>
+<div class="station" style="left:37%;top:65%">📚<br>Responsabilidad</div>
+<div class="station" style="right:5%;top:25%">🪞<br>Honestidad</div>
+<div class="station" style="left:8%;bottom:5%">💛<br>Solidaridad</div>
+<div class="station" style="right:5%;bottom:5%">💗<br>Empatía</div>
+<div id="hero" aria-label="Tu personaje">🧙</div>
+<div class="gem" data-gem="0" style="left:23%;top:32%">💎</div>
+<div class="gem" data-gem="1" style="left:54%;top:23%">💎</div>
+<div class="gem" data-gem="2" style="left:76%;top:53%">💎</div>
+<div class="gem" data-gem="3" style="left:35%;top:76%">💎</div>
+<div class="gem" data-gem="4" style="left:66%;top:78%">💎</div>
+</div>
+<div class="panel">
+<div id="message">¡Hola, guardián! Usa las flechas para moverte. Acércate a un cristal 💎 para desbloquear un reto de valores.</div>
+<div class="controls" aria-label="Controles de movimiento">
+<button id="up" aria-label="Mover arriba">⬆️</button><button id="left" aria-label="Mover izquierda">⬅️</button><button id="down" aria-label="Mover abajo">⬇️</button><button id="right" aria-label="Mover derecha">➡️</button>
+</div>
+<p class="small">También puedes usar las flechas del teclado si juegas en computadora. En el celular, mantén pulsados los botones o tócalos varias veces.</p>
+<div id="quiz"><h3 id="question"></h3><div id="choices"></div><div id="feedback" aria-live="polite"></div><button class="primary" id="continue" style="display:none">Volver al mapa</button></div>
+<div id="win" style="display:none;text-align:center"><h2>🏆 ¡Reino restaurado!</h2><p id="final"></p><p>¿Qué valor vas a practicar hoy en tu casa o colegio?</p><button class="primary" id="restart">Jugar de nuevo</button></div>
+</div>
+<footer>Juego educativo · Creciendo en Valores · Diseñado para celular</footer>
+</main>
+<script>
+const challenges=[
+{value:"Respeto",q:"Un compañero opina diferente a ti. ¿Qué haces?",opts:["Me burlo de su opinión","Escucho y respondo con respeto","Le grito para ganar"],correct:1,why:"Respetar es escuchar y tratar a los demás con dignidad."},
+{value:"Responsabilidad",q:"Tienes una tarea pendiente y te invitan a jugar. ¿Qué haces?",opts:["Organizo mi tiempo y cumplo la tarea","Miento diciendo que ya la hice","La olvido"],correct:0,why:"La responsabilidad es cumplir nuestros deberes y organizar el tiempo."},
+{value:"Honestidad",q:"Encuentras dinero que no es tuyo. ¿Qué haces?",opts:["Me lo quedo","Lo escondo","Lo entrego a una persona adulta para buscar a su dueño"],correct:2,why:"La honestidad es actuar con la verdad y respetar lo ajeno."},
+{value:"Solidaridad",q:"Un compañero no comprende la actividad. ¿Qué haces?",opts:["Me río de él","Le ofrezco ayuda","Lo ignoro"],correct:1,why:"La solidaridad consiste en apoyar a quien lo necesita."},
+{value:"Empatía",q:"Una compañera está triste y nadie la incluye. ¿Qué haces?",opts:["La escucho y la invito a participar","Le digo que no exagere","Me voy sin hablarle"],correct:0,why:"La empatía es intentar comprender cómo se siente otra persona."}
+];
+const positions=[{x:23,y:32},{x:54,y:23},{x:76,y:53},{x:35,y:76},{x:66,y:78}];
+let x=8,y=47,found=new Set(),points=0,current=null,locked=false;
+const hero=document.getElementById('hero'),world=document.getElementById('world');
+function draw(){hero.style.left=x+'%';hero.style.top=y+'%';document.getElementById('score').textContent=found.size;document.getElementById('points').textContent=points;document.getElementById('level').textContent=found.size===5?'Meta desbloqueada':'Nivel '+Math.min(found.size+1,5);}
+function move(dx,dy){if(locked||found.size===5)return;x=Math.max(4,Math.min(96,x+dx));y=Math.max(8,Math.min(91,y+dy));draw();checkGem();}
+function checkGem(){for(let i=0;i<positions.length;i++){if(found.has(i))continue;const p=positions[i];if(Math.hypot((x-p.x)*.8,y-p.y)<11){openChallenge(i);break;}}}
+function openChallenge(i){locked=true;current=i;const c=challenges[i];document.getElementById('quiz').style.display='block';document.getElementById('win').style.display='none';document.getElementById('question').textContent='💎 Reto de '+c.value+': '+c.q;const choices=document.getElementById('choices');choices.innerHTML='';document.getElementById('feedback').textContent='';document.getElementById('continue').style.display='none';c.opts.forEach((o,j)=>{const b=document.createElement('button');b.className='choice';b.textContent=(j+1)+'. '+o;b.onclick=()=>answer(j);choices.appendChild(b)});document.getElementById('message').textContent='¡Has encontrado un cristal! Resuelve el reto para recogerlo.';document.getElementById('quiz').scrollIntoView({behavior:'smooth',block:'nearest'});}
+function answer(j){const c=challenges[current],buttons=[...document.querySelectorAll('.choice')];buttons.forEach(b=>b.disabled=true);const good=j===c.correct;if(good){points+=10;found.add(current);document.querySelector('.gem[data-gem="'+current+'"]').style.display='none';document.getElementById('feedback').innerHTML='✅ <b>¡Correcto! +10 puntos.</b> '+c.why;}else{document.getElementById('feedback').innerHTML='🌱 <b>¡Aprendamos!</b> La mejor respuesta es: '+c.opts[c.correct]+'. '+c.why;found.add(current);document.querySelector('.gem[data-gem="'+current+'"]').style.display='none';}draw();document.getElementById('continue').style.display='block';document.getElementById('continue').textContent=found.size===5?'Ver final 🏆':'Volver al mapa';}
+document.getElementById('continue').onclick=()=>{document.getElementById('quiz').style.display='none';locked=false;if(found.size===5){document.getElementById('win').style.display='block';document.getElementById('final').textContent='Terminaste la aventura con '+points+' puntos. ¡Has recuperado los cinco cristales!';document.getElementById('message').textContent='¡Lo lograste!';document.getElementById('win').scrollIntoView({behavior:'smooth',block:'nearest'});}else{document.getElementById('message').textContent='¡Sigue explorando! Busca los cristales que faltan.';}};
+function bind(id,dx,dy){const b=document.getElementById(id);b.addEventListener('pointerdown',e=>{e.preventDefault();move(dx,dy)});}
+bind('up',0,-6);bind('down',0,6);bind('left',-6,0);bind('right',6,0);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowUp')move(0,-6);if(e.key==='ArrowDown')move(0,6);if(e.key==='ArrowLeft')move(-6,0);if(e.key==='ArrowRight')move(6,0)});
+document.getElementById('restart').onclick=()=>{x=8;y=47;found=new Set();points=0;locked=false;current=null;document.querySelectorAll('.gem').forEach(g=>g.style.display='block');document.getElementById('win').style.display='none';document.getElementById('quiz').style.display='none';document.getElementById('message').textContent='¡Nueva aventura! Usa las flechas y busca los cristales.';draw();};
+draw();
+</script>
+</body>
+</html>
